@@ -65,10 +65,7 @@
 
 (defcustom simpc++-types
   '("char" "int" "long" "short" "void" "bool" "float" "double" "signed" "unsigned"
-    "char16_t" "char32_t" "char8_t" "wchar_t"
-    "int8_t" "uint8_t" "int16_t" "uint16_t"
-    "int32_t" "uint32_t" "int64_t" "uint64_t"
-    "uintptr_t" "size_t" "ptrdiff_t" "va_list")
+    "va_list")
   "Simple C++ base type list."
   :group 'simpc++-mode)
 
