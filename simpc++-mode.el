@@ -138,9 +138,6 @@
     ;; function name: funcname ()
     ("\\_<\\([a-zA-Z_][a-zA-Z0-9_]*\\)[ \t]*(" 1 'font-lock-function-name-face)
 
-    ;; template<typename T> / class T
-    ("\\_<\\(?:typename\\|class\\)\\_>[ \t]+\\([A-Za-z_][A-Za-z0-9_]*\\)" 1 font-lock-type-face)
-
     ;; C++ end return type:：) -> Type {
     (")[ \t]*->[ \t]*\\([A-Za-z_][A-Za-z0-9_:<>]*\\)" 1 font-lock-type-face)
 
