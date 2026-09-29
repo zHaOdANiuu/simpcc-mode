@@ -50,4 +50,4 @@ explicit Webview2ComPtr(Fn callback) : UnwrapArguments<Base, Fn>::Forward(std::m
 (*test3)(vec a, vec2, vec3 c, vec4);
 (*test4)(vec* a, vec2&& b, vec3 *c, vec4);
 (*test4)(vec& a, vec2, vec3 &c, vec4);
-////////////////////////////
+////////////////////////////}

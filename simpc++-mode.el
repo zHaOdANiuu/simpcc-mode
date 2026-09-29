@@ -105,12 +105,8 @@
     ("\\_<\\([A-Za-z_][A-Za-z0-9_]*_t\\)\\_>" 1 font-lock-type-face)
 
     ;; define
-    ("\\<\\(?:enum\\|using\\|struct\\|class\\)[ \t]\\([a-zA-Z0-9_]+\\)"
-     1 font-lock-type-face)
-    ("\\<typedef\\b[ \t][a-zA-Z_][a-zA-Z0-9_]*[ \t]\\([a-zA-Z_][a-zA-Z0-9_]*\\)[ \t];"
-     1 font-lock-type-face)
-    ("\\<typedef\\b[^}]*}[ \t]\\([a-zA-Z_][a-zA-Z0-9_]*\\)"
-     1 font-lock-type-face)
+    ("\\<\\(?:enum\\|using\\|struct\\|class\\)[ \t]\\([a-zA-Z0-9_]+\\)" 1 font-lock-type-face)
+    ("\\<typedef\\b[ \t]+\\([a-zA-Z_][a-zA-Z0-9_]*\\)" 1 font-lock-type-face)
 
     ;; std::xxx
     ("\\_<\\([a-zA-Z_][a-zA-Z0-9_]*\\)::" 1 font-lock-constant-face)
@@ -121,18 +117,15 @@
      ("\\(?:,[A-Za-z_][A-Za-z0-9_]*\\)?\\([A-Za-z_][A-Za-z0-9_]*\\)\\s-*\\(?:,\\|>\\|<\\|$\\)"
       nil nil (1 font-lock-type-face)))
 
-    ;; int a / int& b / type_t c
-    ("^[ \t]+\\([A-Za-z_][A-Za-z0-9_:]*\\(?:[ \t]*<[^;{}()]*>\\)?\\)[ \t*&]+[*&]*[ \t]*\\([A-Za-z_][A-Za-z0-9_]*\\)[ \t]*[*&]*[ \t]*\\(?:[;=,{\\[]\\)"
-     (1 font-lock-type-face))
+    ;; int a / int& b / type c()
+    ("^[ \t]*\\([A-Za-z_][A-Za-z0-9_:]*\\(?:[ \t]*<[^;{}()<>]*>\\)?\\)[ \t*&]+[A-Za-z_][A-Za-z0-9_]*[ \t]*[,;={[(]"
+     1 font-lock-type-face)
 
     ;; 0 / 123
     ("\\_<\\(?:0[xX][0-9a-fA-F']+\\|0[bB][01']+\\|0[0-7']+\\|[0-9][0-9']*\\(?:\\.[0-9']*\\)?\\(?:[eE][+-]?[0-9']+\\)?[uUlLfFzZ]*\\)\\_>"
      0 font-lock-constant-face)
 
-    ;; function return type: type func()
-    ("^[ \t]*\\([A-Za-z_][A-Za-z0-9_:]*\\(?:[ \t]*<[^;{}()]*>\\)?\\)[ \t*&]*" (1 font-lock-type-face))
-
-    ;; function name: funcname ()
+    ;; function name: func ()
     ("\\_<\\([a-zA-Z_][a-zA-Z0-9_]*\\)[ \t]*(" 1 'font-lock-function-name-face)
 
     ;; C++ end return type:：) -> Type {
