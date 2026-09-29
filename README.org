@@ -11,5 +11,5 @@ By package-vc install.
 #+begin_src emacs-lisp
 (use-package simpc++-mode
   :vc (:url "https://github.com/zHaOdANiuu/simpcpp-mode" :rev :newest)
-  :mode "\\.\\(c\\|h\\|cpp\\|hpp\\|cppm\\|ixx\\)\\'")
+  :mode "\\.\\(c\\|h\\|cpp\\|hpp\\|cppm\\|ixx\\|rc\\)\\'")
 #+end_src

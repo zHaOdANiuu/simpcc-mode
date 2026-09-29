@@ -30,7 +30,7 @@
 ;; Enable with:
 ;;
 ;;   (use-package simpc++-mode
-;;      :mode "\\.\\(c\\|h\\|cpp\\|hpp\\|cppm\\|ixx\\)\\'")
+;;      :mode "\\.\\(c\\|h\\|cpp\\|hpp\\|cppm\\|ixx\\|rc\\)\\'")
 ;;
 ;; Customize with `M-x customize-group RET simpc++-mode RET'.
 
@@ -116,10 +116,6 @@
      (1 font-lock-type-face)
      ("\\(?:,[A-Za-z_][A-Za-z0-9_]*\\)?\\([A-Za-z_][A-Za-z0-9_]*\\)\\s-*\\(?:,\\|>\\|<\\|$\\)"
       nil nil (1 font-lock-type-face)))
-
-    ;; int a / int& b / type c()
-    ("^[ \t]*\\(?:\\(?:static\\|const\\|constexpr\\|consteval\\|constinit\\|inline\\|extern\\|mutable\\|virtual\\|friend\\|register\\|thread_local\\|volatile\\|explicit\\|typename\\)[ \t]+\\)*\\([A-Za-z_][A-Za-z0-9_:]*\\(?:[ \t]*<[^;{}()<>]*>\\)?\\)[ \t*&]+[A-Za-z_][A-Za-z0-9_]*[ \t]*[,;={[(]"
-     1 font-lock-type-face)
 
     ;; 0 / 123
     ("\\_<\\(?:0[xX][0-9a-fA-F']+\\|0[bB][01']+\\|0[0-7']+\\|[0-9][0-9']*\\(?:\\.[0-9']*\\)?\\(?:[eE][+-]?[0-9']+\\)?[uUlLfFzZ]*\\)\\_>"
