@@ -1,5 +1,5 @@
 ////////////////////////////
-static vec abc;
+vec abc;
 vec* abc;
 vec *abc;
 vec& abc;

@@ -111,21 +111,12 @@
     ;; std::xxx
     ("\\_<\\([a-zA-Z_][a-zA-Z0-9_]*\\)::" 1 font-lock-constant-face)
 
-    ;; vector<T> / Map<K,V>
-    ("\\_<\\([A-Za-z_][A-Za-z0-9_]*\\)<"
-     (1 font-lock-type-face)
-     ("\\(?:,[A-Za-z_][A-Za-z0-9_]*\\)?\\([A-Za-z_][A-Za-z0-9_]*\\)\\s-*\\(?:,\\|>\\|<\\|$\\)"
-      nil nil (1 font-lock-type-face)))
-
     ;; 0 / 123
     ("\\_<\\(?:0[xX][0-9a-fA-F']+\\|0[bB][01']+\\|0[0-7']+\\|[0-9][0-9']*\\(?:\\.[0-9']*\\)?\\(?:[eE][+-]?[0-9']+\\)?[uUlLfFzZ]*\\)\\_>"
      0 font-lock-constant-face)
 
     ;; function name: func ()
     ("\\_<\\([a-zA-Z_][a-zA-Z0-9_]*\\)[ \t]*(" 1 'font-lock-function-name-face)
-
-    ;; C++ end return type:：) -> Type {
-    (")[ \t]*->[ \t]*\\([A-Za-z_][A-Za-z0-9_:<>]*\\)" 1 font-lock-type-face)
 
     ;; [[nodiscard]] [[deprecated]]
     ("\\[\\[[ \t]*\\([A-Za-z_][A-Za-z0-9_]*\\)" 1 font-lock-builtin-face)
