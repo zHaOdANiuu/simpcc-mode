@@ -102,6 +102,7 @@
      0 font-lock-keyword-face)
     (,(regexp-opt simpc++-keywords 'symbols) 0 font-lock-keyword-face)
     (,(regexp-opt simpc++-types 'symbols) 0 font-lock-type-face)
+    ("\\_<\\([A-Za-z_][A-Za-z0-9_]*_t\\)\\_>" 1 font-lock-type-face)
 
     ;; define
     ("\\<\\(?:enum\\|using\\|struct\\|class\\)[ \t]\\([a-zA-Z0-9_]+\\)"
@@ -121,9 +122,8 @@
       nil nil (1 font-lock-type-face)))
 
     ;; int a / int& b / type_t c
-    ("^[ \t]*\\(?:[ \t]+\\)*\\([A-Za-z_][A-Za-z0-9_:]*\\(?:[ \t]*<[^;{}()]*>\\)?\\)[ \t*&]+[*&]*[ \t]*\\([A-Za-z_][A-Za-z0-9_]*\\)[ \t]*[*&]*[ \t]*\\(?:[;=,{\\[]\\)"
+    ("^[ \t]+\\([A-Za-z_][A-Za-z0-9_:]*\\(?:[ \t]*<[^;{}()]*>\\)?\\)[ \t*&]+[*&]*[ \t]*\\([A-Za-z_][A-Za-z0-9_]*\\)[ \t]*[*&]*[ \t]*\\(?:[;=,{\\[]\\)"
      (1 font-lock-type-face))
-    ("\\_<\\([A-Za-z_][A-Za-z0-9_]*_t\\)\\_>" 1 font-lock-type-face)
 
     ;; 0 / 123
     ("\\_<\\(?:0[xX][0-9a-fA-F']+\\|0[bB][01']+\\|0[0-7']+\\|[0-9][0-9']*\\(?:\\.[0-9']*\\)?\\(?:[eE][+-]?[0-9']+\\)?[uUlLfFzZ]*\\)\\_>"
