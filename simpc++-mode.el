@@ -118,7 +118,7 @@
       nil nil (1 font-lock-type-face)))
 
     ;; int a / int& b / type c()
-    ("^[ \t]*\\([A-Za-z_][A-Za-z0-9_:]*\\(?:[ \t]*<[^;{}()<>]*>\\)?\\)[ \t*&]+[A-Za-z_][A-Za-z0-9_]*[ \t]*[,;={[(]"
+    ("^[ \t]*\\(?:\\(?:static\\|const\\|constexpr\\|consteval\\|constinit\\|inline\\|extern\\|mutable\\|virtual\\|friend\\|register\\|thread_local\\|volatile\\|explicit\\|typename\\)[ \t]+\\)*\\([A-Za-z_][A-Za-z0-9_:]*\\(?:[ \t]*<[^;{}()<>]*>\\)?\\)[ \t*&]+[A-Za-z_][A-Za-z0-9_]*[ \t]*[,;={[(]"
      1 font-lock-type-face)
 
     ;; 0 / 123
