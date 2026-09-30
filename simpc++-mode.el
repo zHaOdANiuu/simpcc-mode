@@ -64,8 +64,28 @@
   :group 'simpc++-mode)
 
 (defcustom simpc++-types
-  '("char" "int" "long" "short" "void" "bool" "float" "double" "signed" "unsigned"
-    "va_list")
+  '("FILE"
+    "_Bool" "_Complex" "_Imaginary"
+    "bool"
+    "char" "double" "float" "int" "long" "short"
+    "signed" "unsigned" "void"
+    "size_t" "ssize_t" "ptrdiff_t"
+    "wchar_t" "wint_t" "wctype_t"
+    "char8_t" "char16_t" "char_32_t"
+    "int8_t"  "int16_t"  "int32_t"  "int64_t"
+    "uint8_t" "uint16_t" "uint32_t" "uint64_t"
+    "int_least8_t"  "int_least16_t"  "int_least32_t"  "int_least64_t"
+    "uint_least8_t" "uint_least16_t" "uint_least32_t" "uint_least64_t"
+    "uint_fast8_t" "uint_fast16_t" "uint_fast32_t" "uint_fast64_t"
+    "int_fast8_t"  "int_fast16_t"  "int_fast32_t"  "int_fast64_t"
+    "intptr_t" "uintptr_t" "intmax_t" "uintmax_t"
+    "float16_t" "float32_t" "float64_t" "float128_t" "bfloat16_t"
+    "clock_t" "time_t"
+    "dev_t" "gid_t" "ino_t" "mode_t" "nlink_t" "off_t" "pid_t" "uid_t"
+    "sig_atomic_t"
+    "mbstate_t" "wctrans_t"
+    "va_list" "fpos_t" "jmp_buf"
+    "div_t" "ldiv_t" "lldiv_t")
   "Simple C++ base type list."
   :group 'simpc++-mode)
 
@@ -102,7 +122,6 @@
      0 font-lock-keyword-face)
     (,(regexp-opt simpc++-keywords 'symbols) 0 font-lock-keyword-face)
     (,(regexp-opt simpc++-types 'symbols) 0 font-lock-type-face)
-    ("\\_<\\([A-Za-z_][A-Za-z0-9_]*_t\\)\\_>" 1 font-lock-type-face)
 
     ;; define
     ("\\<\\(?:enum\\|using\\|struct\\|class\\)[ \t]\\([a-zA-Z0-9_]+\\)" 1 font-lock-type-face)
@@ -115,14 +134,15 @@
     ("\\_<\\(?:0[xX][0-9a-fA-F']+\\|0[bB][01']+\\|0[0-7']+\\|[0-9][0-9']*\\(?:\\.[0-9']*\\)?\\(?:[eE][+-]?[0-9']+\\)?[uUlLfFzZ]*\\)\\_>"
      0 font-lock-constant-face)
 
-    ;; function name: func ()
-    ("\\_<\\([a-zA-Z_][a-zA-Z0-9_]*\\)[ \t]*(" 1 'font-lock-function-name-face)
-
     ;; [[nodiscard]] [[deprecated]]
     ("\\[\\[[ \t]*\\([A-Za-z_][A-Za-z0-9_]*\\)" 1 font-lock-builtin-face)
 
     ;; __attribute__ / __declspec
-    ("\\_<\\(__attribute__\\|__declspec\\)\\_>" 1 font-lock-builtin-face))
+    ("\\_<\\(__attribute__\\|__declspec\\)\\_>" 1 font-lock-builtin-face)
+
+    ;; c++ 26
+    ("\\(\\^\\^\\|\\[:\\)" 0 font-lock-builtin-face)
+    (":\\]" 0 font-lock-builtin-face))
   "Simplea C++ face lock list."
   :group 'simpc++-mode)
 
