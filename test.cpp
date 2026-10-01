@@ -12,7 +12,7 @@ int a[10];
 auto a = [b](int a, vec b) -> int {};
 auto a = std::vector<int>{};
 auto a = std::vector<vec>{};
-auto& [abc, def] = std::vector<vec>{};
+auto &[abc, def] = std::vector<vec>{};
 ////////////////////////////
 BVAR (current_buffer, directory);
 eassert (0 < vfork_error);

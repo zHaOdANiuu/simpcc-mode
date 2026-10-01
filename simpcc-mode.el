@@ -1,12 +1,12 @@
-;;; simpc++-mode.el --- Simple C++ mode -*- lexical-binding: t; -*-
+;;; simpcc-mode.el --- Simple C++ mode -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2026 zhaodaniu
 
 ;; Author: zhaodaniu <zhaodaniu1@gmail.com>
-;; Homepage: https://github.com/zHaOdANiuu/simpcpp-mode
+;; Homepage: https://github.com/zHaOdANiuu/simpcc-mode
 ;; Version: 1.0.0
 ;; Package-Requires: ((emacs "28.1"))
-;; Keywords: simpc++-mode, simple, fast
+;; Keywords: simpcc-mode, simple, fast
 
 ;; This file is not part of GNU Emacs.
 
@@ -29,23 +29,23 @@
 ;;
 ;; Enable with:
 ;;
-;;   (use-package simpc++-mode
-;;      :mode "\\.\\(c\\|h\\|cpp\\|hpp\\|cppm\\|ixx\\|rc\\)\\'")
+;;   (require 'simpcc-mode)
+;;   (simpcc-mode)
 ;;
-;; Customize with `M-x customize-group RET simpc++-mode RET'.
+;; Customize with `M-x customize-group RET simpcc-mode RET'.
 
 ;;; Code:
 
-(defgroup simpc++-mode nil
+(defgroup simpcc-mode nil
   "Simplae C++ mode group."
-  :prefix "simpc++-mode")
+  :prefix "simpcc-mode")
 
-(defcustom simpc++-indent-width 2
-  "Simpc++ indent width."
+(defcustom simpcc-indent-width 2
+  "simpcc indent width."
   :type 'number
-  :group 'simpc++-mode)
+  :group 'simpcc-mode)
 
-(defcustom simpc++-mode-syntax-table
+(defcustom simpcc-mode-syntax-table
   (let ((table (make-syntax-table)))
     (modify-syntax-entry ?/ ". 124b" table)
     (modify-syntax-entry ?* ". 23" table)
@@ -61,35 +61,22 @@
     (modify-syntax-entry ?= "." table)
     table)
   "Simplae c++ syntax table."
-  :group 'simpc++-mode)
+  :group 'simpcc-mode)
 
-(defcustom simpc++-types
+(defcustom simpcc-types
   '("FILE"
-    "_Bool" "_Complex" "_Imaginary"
-    "bool"
-    "char" "double" "float" "int" "long" "short"
-    "signed" "unsigned" "void"
-    "size_t" "ssize_t" "ptrdiff_t"
-    "wchar_t" "wint_t" "wctype_t"
-    "char8_t" "char16_t" "char_32_t"
+    "char" "int" "long" "short" "void" "bool" "float" "double" "signed" "unsigned"
+    "char8_t" "char16_t" "char32_t"
     "int8_t"  "int16_t"  "int32_t"  "int64_t"
     "uint8_t" "uint16_t" "uint32_t" "uint64_t"
-    "int_least8_t"  "int_least16_t"  "int_least32_t"  "int_least64_t"
-    "uint_least8_t" "uint_least16_t" "uint_least32_t" "uint_least64_t"
-    "uint_fast8_t" "uint_fast16_t" "uint_fast32_t" "uint_fast64_t"
-    "int_fast8_t"  "int_fast16_t"  "int_fast32_t"  "int_fast64_t"
-    "intptr_t" "uintptr_t" "intmax_t" "uintmax_t"
     "float16_t" "float32_t" "float64_t" "float128_t" "bfloat16_t"
-    "clock_t" "time_t"
-    "dev_t" "gid_t" "ino_t" "mode_t" "nlink_t" "off_t" "pid_t" "uid_t"
-    "sig_atomic_t"
-    "mbstate_t" "wctrans_t"
-    "va_list" "fpos_t" "jmp_buf"
-    "div_t" "ldiv_t" "lldiv_t")
+    "size_t"
+    "intptr_t" "uintptr_t" "ptrdiff_t"
+    "va_list")
   "Simple C++ base type list."
-  :group 'simpc++-mode)
+  :group 'simpcc-mode)
 
-(defcustom simpc++-keywords
+(defcustom simpcc-keywords
   '("module" "export" "import"
     "class" "struct" "union" "enum" "typedef" "using"
     "decltype" "sizeof" "alignas" "alignof" "typeid"
@@ -110,43 +97,30 @@
     "namespace" "asm" "static_assert" "reflexpr" "synchronized" "atomic_cancel"
     "atomic_commit" "atomic_noexcept")
   "Simple C++ keywords."
-  :group 'simpc++-mode)
+  :group 'simpcc-mode)
 
-(defcustom simpc++-font-lock-keywords
+(defcustom simpcc-font-lock-keywords
   `(;; initilation
-    ("^[ \t]*#[ \t]*\\(warn\\|error\\)" 0 font-lock-warning-face)
     ("^[ \t]*#[ \t]*\\(?:[a-zA-Z0-9_]+\\)" 0 font-lock-preprocessor-face)
+    ("^[ \t]*#[ \t]*\\(warn\\|error\\)" 0 font-lock-warning-face)
     ("^[ \t]*#[ \t]*include\\(?:_next\\)?\\s-+\\(\\(<\\|\"\\).*\\(>\\|\"\\)\\)" 1 font-lock-string-face)
-    ("\\_<\\(defined\\)\\_>" 1 font-lock-preprocessor-face)
-    ("\\(?:@\\|\\\\\\)\\(?:param\\|tparam\\|brief\\|return\\|returns\\|retval\\|note\\|warning\\|see\\|sa\\|author\\|date\\|todo\\|throw\\|throws\\|exception\\|deprecated\\|since\\|file\\|class\\|struct\\|fn\\|var\\|def\\|namespace\\|enum\\|property\\|ingroup\\|addtogroup\\)\\_>"
-     0 font-lock-keyword-face)
-    (,(regexp-opt simpc++-keywords 'symbols) 0 font-lock-keyword-face)
-    (,(regexp-opt simpc++-types 'symbols) 0 font-lock-type-face)
-
-    ;; define
-    ("\\<\\(?:enum\\|using\\|struct\\|class\\)[ \t]\\([a-zA-Z0-9_]+\\)" 1 font-lock-type-face)
-    ("\\<typedef\\b[ \t]+\\([a-zA-Z_][a-zA-Z0-9_]*\\)" 1 font-lock-type-face)
-
-    ;; std::xxx
-    ("\\_<\\([a-zA-Z_][a-zA-Z0-9_]*\\)::" 1 font-lock-constant-face)
-
+    ("\\_<defined\\_>" 0 font-lock-preprocessor-face)
+    (,(regexp-opt simpcc-keywords 'symbols) 0 font-lock-keyword-face)
+    (,(regexp-opt simpcc-types 'symbols) 0 font-lock-type-face)
     ;; 0 / 123
     ("\\_<\\(?:0[xX][0-9a-fA-F']+\\|0[bB][01']+\\|0[0-7']+\\|[0-9][0-9']*\\(?:\\.[0-9']*\\)?\\(?:[eE][+-]?[0-9']+\\)?[uUlLfFzZ]*\\)\\_>"
      0 font-lock-constant-face)
-
     ;; [[nodiscard]] [[deprecated]]
     ("\\[\\[[ \t]*\\([A-Za-z_][A-Za-z0-9_]*\\)" 1 font-lock-builtin-face)
-
     ;; __attribute__ / __declspec
     ("\\_<\\(__attribute__\\|__declspec\\)\\_>" 1 font-lock-builtin-face)
-
     ;; c++ 26
     ("\\(\\^\\^\\|\\[:\\)" 0 font-lock-builtin-face)
     (":\\]" 0 font-lock-builtin-face))
   "Simplea C++ face lock list."
-  :group 'simpc++-mode)
+  :group 'simpcc-mode)
 
-(defun simpc++--proper-indentation (parse-status)
+(defun simpcc--proper-indentation (parse-status)
   "Simple C++ format function.
 Argument PARSE-STATUS is current syntax context."
   (let ((depth (nth 0 parse-status))             ; Depth in parens
@@ -184,7 +158,7 @@ Argument PARSE-STATUS is current syntax context."
         (save-excursion
           (forward-line -1)
           (back-to-indentation)
-          (+ (current-indentation) simpc++-indent-width)))
+          (+ (current-indentation) simpcc-indent-width)))
 
        (paren-start
         (let* ((close-p (looking-at "[]})]"))
@@ -192,7 +166,7 @@ Argument PARSE-STATUS is current syntax context."
           (goto-char paren-start)
           (back-to-indentation)
           (+ (current-column)
-             (* simpc++-indent-width
+             (* simpcc-indent-width
                 (cond
                  (close-p 0)
                  ((looking-at "\\_<switch\\_>") (if label-p 1 2))
@@ -201,23 +175,23 @@ Argument PARSE-STATUS is current syntax context."
 
        (t (prog-first-column))))))
 
-(defun simpc++-indent-line ()
+(defun simpcc-indent-line ()
   "Simple C++ indent function."
   (let* ((parse-status
           (save-excursion (syntax-ppss (line-beginning-position))))
          (offset (- (point) (save-excursion (back-to-indentation) (point)))))
     (unless (nth 3 parse-status)
-      (indent-line-to (simpc++--proper-indentation parse-status))
+      (indent-line-to (simpcc--proper-indentation parse-status))
       (when (> offset 0) (forward-char offset)))))
 
-(define-derived-mode simpc++-mode prog-mode "Simple C++"
+(define-derived-mode simpcc-mode prog-mode "Simple C++"
   "Simple major mode for editing C++ files."
-  :syntax-table simpc++-mode-syntax-table
-  (setq-local font-lock-defaults '(simpc++-font-lock-keywords))
-  (setq-local indent-line-function #'simpc++-indent-line)
+  :syntax-table simpcc-mode-syntax-table
+  (setq-local font-lock-defaults '(simpcc-font-lock-keywords))
+  (setq-local indent-line-function #'simpcc-indent-line)
   (setq-local comment-start "// ")
   (setq-local indent-tabs-mode nil)
-  (setq-local tab-width simpc++-indent-width))
+  (setq-local tab-width simpcc-indent-width))
 
-(provide 'simpc++-mode)
-;;; simpc++-mode.el ends here
+(provide 'simpcc-mode)
+;;; simpcc-mode.el ends here

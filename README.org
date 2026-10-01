@@ -1,6 +1,6 @@
-* Simple C++ mode for Emacs
+* Simple CC mode for Emacs
 
-This is a *C++* specialized version of [[https://github.com/rexim/simpc-mode][simpc-mode]].  simpc++-mode provides richer
+This is a *C++* specialized version of [[https://github.com/rexim/simpc-mode][simpc-mode]].  simpcc-mode provides richer
 highlighting for C++ files, and that's it.  It keeps fast opening, efficient
 editing, and quick jumping.
 
@@ -9,7 +9,7 @@ editing, and quick jumping.
 By package-vc install.
 
 #+begin_src emacs-lisp
-(use-package simpc++-mode
-  :vc (:url "https://github.com/zHaOdANiuu/simpcpp-mode" :rev :newest)
-  :mode "\\.\\(c\\|h\\|cpp\\|hpp\\|cppm\\|ixx\\|rc\\)\\'")
+(use-package simpcc-mode
+  :vc (:url "https://github.com/zHaOdANiuu/simpcc-mode" :rev :newest)
+  :mode "\\.\\(c\\|h\\|cc\\|hh\\|cpp\\|hpp\\|cppm\\|ixx\\|rc\\)\\'")
 #+end_src
