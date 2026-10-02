@@ -142,9 +142,9 @@
     ("\\_<\\(?:0[xX][0-9a-fA-F']+\\|0[bB][01']+\\|0[0-7']+\\|[0-9][0-9']*\\(?:\\.[0-9']*\\)?\\(?:[eE][+-]?[0-9']+\\)?[uUlLfFzZ]*\\)\\_>"
      . font-lock-constant-face)
     ;; [[nodiscard]] [[deprecated]]
-    ("\\[\\[[ \t]*\\([A-Za-z_][A-Za-z0-9_]*\\)" 1 font-lock-builtin-face)
+    ("\\[\\[[ \t]*\\([A-Za-z_][A-Za-z0-9_]*\\)" (1 font-lock-builtin-face))
     ;; __attribute__ / __declspec
-    ("\\_<\\(__attribute__\\|__declspec\\)\\_>" 1 font-lock-builtin-face)
+    ("\\_<\\(__attribute__\\|__declspec\\)\\_>" . font-lock-builtin-face)
     ;; c++ 26
     ("\\(\\^\\^\\|\\[:\\)" . font-lock-builtin-face)
     (":\\]" . font-lock-builtin-face))
