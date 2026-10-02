@@ -37,7 +37,7 @@
 ;;; Code:
 
 (defgroup simpcc-mode nil
-  "Simplae C++ mode group."
+  "Simplae CC mode group."
   :prefix "simpcc-mode")
 
 (defcustom simpcc-indent-width 2
@@ -60,7 +60,7 @@
     (modify-syntax-entry ?- "." table)
     (modify-syntax-entry ?= "." table)
     table)
-  "Simplae c++ syntax table."
+  "Simplae CC syntax table."
   :group 'simpcc-mode)
 
 (defcustom simpcc-types
@@ -73,7 +73,7 @@
     "size_t"
     "intptr_t" "uintptr_t" "ptrdiff_t"
     "va_list")
-  "Simple C++ base type list."
+  "Simple CC base type list."
   :group 'simpcc-mode)
 
 (defcustom simpcc-keywords
@@ -96,32 +96,63 @@
     "bitand" "bitor" "compl"
     "namespace" "asm" "static_assert" "reflexpr" "synchronized" "atomic_cancel"
     "atomic_commit" "atomic_noexcept")
-  "Simple C++ keywords."
+  "Simple CC keywords."
+  :group 'simpcc-mode)
+
+(defcustom simpcc-constant
+  '("true" "false" "nullptr" "NULL"
+
+    ;; GNU
+    "__GNUC__" "__FUNCTION__" "__PRETTY_FUNCTION__" "__func__"
+
+    ;; std
+    "__LINE__" "__FILE__" "__DATE__" "__TIME__"
+    "__STDC__" "__STDC_VERSION__" "__STDC_HOSTED__"
+
+    ;; c99
+    "__STDC_ISO_10646__"
+    "__STDC_IEC_559_COMPLEX__"
+    "__STDC_MB_MIGHT_NEQ_WC__"
+    "__VA_ARGS__"
+
+    "LLONG_MIN" "LLONG_MAX" "ULLONG_MAX"
+    "INT8_MIN" "INT16_MIN" "INT32_MIN" "INT64_MIN"
+    "INT8_MAX" "INT16_MAX" "INT32_MAX" "INT64_MAX"
+    "UINT8_MAX" "UINT16_MAX" "UINT32_MAX" "UINT64_MAX"
+    "INTPTR_MIN" "INTPTR_MAX" "UINTPTR_MAX"
+    "INTMAX_MIN" "INTMAX_MAX" "UINTMAX_MAX"
+    "PTRDIFF_MIN" "PTRDIFF_MAX"
+    "SIG_ATOMIC_MIN" "SIG_ATOMIC_MAX"
+    "SIZE_MAX"
+    "WCHAR_MIN" "WCHAR_MAX"
+    "WINT_MIN" "WINT_MAX")
+  "Simple CC constant."
   :group 'simpcc-mode)
 
 (defcustom simpcc-font-lock-keywords
   `(;; initilation
-    ("^[ \t]*#[ \t]*\\(?:[a-zA-Z0-9_]+\\)" 0 font-lock-preprocessor-face)
-    ("^[ \t]*#[ \t]*\\(warn\\|error\\)" 0 font-lock-warning-face)
+    ("^[ \t]*#[ \t]*\\(?:[a-zA-Z0-9_]+\\)" . font-lock-preprocessor-face)
+    ("^[ \t]*#[ \t]*\\(warn\\|error\\)" . font-lock-warning-face)
     ("^[ \t]*#[ \t]*include\\(?:_next\\)?\\s-+\\(\\(<\\|\"\\).*\\(>\\|\"\\)\\)" 1 font-lock-string-face)
-    ("\\_<defined\\_>" 0 font-lock-preprocessor-face)
-    (,(regexp-opt simpcc-keywords 'symbols) 0 font-lock-keyword-face)
-    (,(regexp-opt simpcc-types 'symbols) 0 font-lock-type-face)
+    ("\\_<defined\\_>" . font-lock-preprocessor-face)
+    (,(regexp-opt simpcc-keywords 'symbols) . font-lock-keyword-face)
+    (,(regexp-opt simpcc-types 'symbols) . font-lock-type-face)
+    (,(regexp-opt simpcc-constant 'symbols) . font-lock-constant-face)
     ;; 0 / 123
     ("\\_<\\(?:0[xX][0-9a-fA-F']+\\|0[bB][01']+\\|0[0-7']+\\|[0-9][0-9']*\\(?:\\.[0-9']*\\)?\\(?:[eE][+-]?[0-9']+\\)?[uUlLfFzZ]*\\)\\_>"
-     0 font-lock-constant-face)
+     . font-lock-constant-face)
     ;; [[nodiscard]] [[deprecated]]
     ("\\[\\[[ \t]*\\([A-Za-z_][A-Za-z0-9_]*\\)" 1 font-lock-builtin-face)
     ;; __attribute__ / __declspec
     ("\\_<\\(__attribute__\\|__declspec\\)\\_>" 1 font-lock-builtin-face)
     ;; c++ 26
-    ("\\(\\^\\^\\|\\[:\\)" 0 font-lock-builtin-face)
-    (":\\]" 0 font-lock-builtin-face))
-  "Simplea C++ face lock list."
+    ("\\(\\^\\^\\|\\[:\\)" . font-lock-builtin-face)
+    (":\\]" . font-lock-builtin-face))
+  "Simplea CC face lock list."
   :group 'simpcc-mode)
 
 (defun simpcc--proper-indentation (parse-status)
-  "Simple C++ format function.
+  "Simple CC format function.
 Argument PARSE-STATUS is current syntax context."
   (let ((depth (nth 0 parse-status))             ; Depth in parens
         (paren-start (nth 1 parse-status))       ; Position of the paren that started this list
@@ -176,7 +207,7 @@ Argument PARSE-STATUS is current syntax context."
        (t (prog-first-column))))))
 
 (defun simpcc-indent-line ()
-  "Simple C++ indent function."
+  "Simple CC indent function."
   (let* ((parse-status
           (save-excursion (syntax-ppss (line-beginning-position))))
          (offset (- (point) (save-excursion (back-to-indentation) (point)))))
@@ -184,8 +215,8 @@ Argument PARSE-STATUS is current syntax context."
       (indent-line-to (simpcc--proper-indentation parse-status))
       (when (> offset 0) (forward-char offset)))))
 
-(define-derived-mode simpcc-mode prog-mode "Simple C++"
-  "Simple major mode for editing C++ files."
+(define-derived-mode simpcc-mode prog-mode "Simple CC"
+  "Simple major mode for editing CC files."
   :syntax-table simpcc-mode-syntax-table
   (setq-local font-lock-defaults '(simpcc-font-lock-keywords))
   (setq-local indent-line-function #'simpcc-indent-line)
