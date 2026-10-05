@@ -130,21 +130,19 @@
   :group 'simpcc-mode)
 
 (defcustom simpcc-font-lock-keywords
-  `(;; initilation
-    ("^[ \t]*#[ \t]*\\(?:[a-zA-Z0-9_]+\\)" . font-lock-preprocessor-face)
+  `(("^[ \t]*#[ \t]*\\(?:[a-zA-Z0-9_]+\\)" . font-lock-preprocessor-face)
     ("^[ \t]*#[ \t]*\\(warn\\|error\\)" . font-lock-warning-face)
     ("^[ \t]*#[ \t]*include\\(?:_next\\)?\\s-+\\(\\(<\\|\"\\).*\\(>\\|\"\\)\\)" 1 font-lock-string-face)
     ("\\_<defined\\_>" . font-lock-preprocessor-face)
     (,(regexp-opt simpcc-keywords 'symbols) . font-lock-keyword-face)
     (,(regexp-opt simpcc-types 'symbols) . font-lock-type-face)
     (,(regexp-opt simpcc-constant 'symbols) . font-lock-constant-face)
+    (,(regexp-opt '("__attribute__" "__declspec") 'symbols) . font-lock-constant-face)
     ;; 0 / 123
     ("\\_<\\(?:0[xX][0-9a-fA-F']+\\|0[bB][01']+\\|0[0-7']+\\|[0-9][0-9']*\\(?:\\.[0-9']*\\)?\\(?:[eE][+-]?[0-9']+\\)?[uUlLfFzZ]*\\)\\_>"
      . font-lock-constant-face)
     ;; [[nodiscard]] [[deprecated]]
     ("\\[\\[[ \t]*\\([A-Za-z_][A-Za-z0-9_]*\\)" (1 font-lock-builtin-face))
-    ;; __attribute__ / __declspec
-    ("\\_<\\(__attribute__\\|__declspec\\)\\_>" . font-lock-builtin-face)
     ;; c++ 26
     ("\\(\\^\\^\\|\\[:\\)" . font-lock-builtin-face)
     (":\\]" . font-lock-builtin-face))
@@ -182,6 +180,14 @@ Argument PARSE-STATUS is current syntax context."
       (cond
        (in-comment (current-indentation))
 
+       ((looking-at "[]})]")
+        (if paren-start
+            (progn
+              (goto-char paren-start)
+              (back-to-indentation)
+              (current-column))
+          (prog-first-column)))
+
        ((save-excursion
           (forward-line -1)
           (back-to-indentation)
@@ -192,14 +198,13 @@ Argument PARSE-STATUS is current syntax context."
           (+ (current-indentation) simpcc-indent-width)))
 
        (paren-start
-        (let* ((close-p (looking-at "[]})]"))
-               (label-p (string-suffix-p ":" cur-line)))
+        (let ((label-p (and (string-suffix-p ":" cur-line)
+                            (not (eq (aref cur-line (- (length cur-line) 2)) ?\s)))))
           (goto-char paren-start)
           (back-to-indentation)
           (+ (current-column)
              (* simpcc-indent-width
                 (cond
-                 (close-p 0)
                  ((looking-at "\\_<switch\\_>") (if label-p 1 2))
                  (label-p 0)
                  (t 1))))))
