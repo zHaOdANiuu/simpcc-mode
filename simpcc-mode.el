@@ -198,8 +198,11 @@ Argument PARSE-STATUS is current syntax context."
           (+ (current-indentation) simpcc-indent-width)))
 
        (paren-start
-        (let ((label-p (looking-at "\\_<\\([A-Za-z_][A-Za-z0-9_]*\\)\\_>:"))
-              (case-p (looking-at "\\_<\\(case\\|default\\)\\_>")))
+        (let ((label-p) (case-p))
+          (save-excursion
+            (back-to-indentation)
+            (setq label-p (looking-at "\\_<\\([A-Za-z_][A-Za-z0-9_]*\\)\\_>:")
+                  case-p (looking-at "\\_<\\(case\\|default\\)\\_>")))
           (goto-char paren-start)
           (back-to-indentation)
           (+ (current-column)
