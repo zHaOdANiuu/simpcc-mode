@@ -195,7 +195,10 @@ Argument PARSE-STATUS is current syntax context."
           (when (re-search-forward "\\(?:return\\|=\\)[ \t]+" (line-end-position) t)
             (current-column))))
 
-       ((eq (char-after (1- (line-end-position))) ?\;)
+       ((save-excursion
+          (forward-line -1)
+          (back-to-indentation)
+          (looking-at "\\_<\\(if\\|while\\|for\\|else\\|do\\|try\\|catch\\)\\_>"))
         (save-excursion
           (forward-line -1)
           (back-to-indentation)
