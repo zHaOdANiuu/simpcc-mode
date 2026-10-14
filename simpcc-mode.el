@@ -66,6 +66,7 @@
 (defcustom simpcc-types
   '("FILE"
     "char" "int" "long" "short" "void" "bool" "float" "double" "signed" "unsigned"
+    "wchar_t"
     "char8_t" "char16_t" "char32_t"
     "int8_t"  "int16_t"  "int32_t"  "int64_t"
     "uint8_t" "uint16_t" "uint32_t" "uint64_t"
@@ -130,14 +131,10 @@
   :group 'simpcc-mode)
 
 (defcustom simpcc-font-lock-keywords
-  `(("^[ \t]*#[ \t]*\\(?:[a-zA-Z0-9_]+\\)" . font-lock-preprocessor-face)
-    ("^[ \t]*#[ \t]*\\(warn\\|error\\)" . font-lock-warning-face)
-    ("^[ \t]*#[ \t]*include\\(?:_next\\)?\\s-+\\(\\(<\\|\"\\).*\\(>\\|\"\\)\\)" 1 font-lock-string-face)
+  `(("# *\\(warn\\|error\\)" . font-lock-warning-face)
+    ("# *[#a-zA-Z0-9_]+" . font-lock-preprocessor-face)
+    ("# *include\\(?:_next\\)?\\s-+\\(\\(<\\|\"\\).*\\(>\\|\"\\)\\)" . (1 font-lock-string-face))
     ("\\_<defined\\_>" . font-lock-preprocessor-face)
-    (,(regexp-opt simpcc-keywords 'symbols) . font-lock-keyword-face)
-    (,(regexp-opt simpcc-types 'symbols) . font-lock-type-face)
-    (,(regexp-opt simpcc-constant 'symbols) . font-lock-constant-face)
-    (,(regexp-opt '("__attribute__" "__declspec") 'symbols) . font-lock-constant-face)
     ;; 0 / 123
     ("\\_<\\(?:0[xX][0-9a-fA-F']+\\|0[bB][01']+\\|0[0-7']+\\|[0-9][0-9']*\\(?:\\.[0-9']*\\)?\\(?:[eE][+-]?[0-9']+\\)?[uUlLfFzZ]*\\)\\_>"
      . font-lock-constant-face)
@@ -145,7 +142,11 @@
     ("\\[\\[[ \t]*\\([A-Za-z_][A-Za-z0-9_]*\\)" (1 font-lock-builtin-face))
     ;; c++ 26
     ("\\(\\^\\^\\|\\[:\\)" . font-lock-builtin-face)
-    (":\\]" . font-lock-builtin-face))
+    (":\\]" . font-lock-builtin-face)
+    (,(regexp-opt simpcc-keywords 'symbols) . font-lock-keyword-face)
+    (,(regexp-opt simpcc-types 'symbols) . font-lock-type-face)
+    (,(regexp-opt simpcc-constant 'symbols) . font-lock-constant-face)
+    (,(regexp-opt '("__attribute__" "__declspec") 'symbols) . font-lock-constant-face))
   "Simplea CC face lock list."
   :group 'simpcc-mode)
 
@@ -188,10 +189,13 @@ Argument PARSE-STATUS is current syntax context."
               (current-column))
           (prog-first-column)))
 
-       ((save-excursion
+       ((looking-at "&&\\|||\\|[|&+*/?:-]")
+        (save-excursion
           (forward-line -1)
-          (back-to-indentation)
-          (looking-at "\\_<\\(if\\|while\\|for\\|else\\|do\\|try\\|catch\\)\\_>"))
+          (when (re-search-forward "\\(?:return\\|=\\)[ \t]+" (line-end-position) t)
+            (current-column))))
+
+       ((eq (char-after (1- (line-end-position))) ?\;)
         (save-excursion
           (forward-line -1)
           (back-to-indentation)
