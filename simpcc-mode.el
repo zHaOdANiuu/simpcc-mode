@@ -192,8 +192,9 @@ Argument PARSE-STATUS is current syntax context."
        ((looking-at "&&\\|||\\|[|&+*/?:-]")
         (save-excursion
           (forward-line -1)
-          (when (re-search-forward "\\(?:return\\|=\\)[ \t]+" (line-end-position) t)
-            (current-column))))
+          (unless (re-search-forward "\\(?:return\\|=\\)[ \t]+" (line-end-position) t)
+            (back-to-indentation))
+          (current-column)))
 
        ((save-excursion
           (forward-line -1)
