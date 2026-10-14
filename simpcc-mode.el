@@ -181,7 +181,10 @@ Argument PARSE-STATUS is current syntax context."
       (cond
        (in-comment (current-indentation))
 
-       ((looking-at "[]})]")
+       ((looking-at-p "[ \t]*#")
+        (prog-first-column))
+
+       ((looking-at-p "[]})]")
         (if paren-start
             (progn
               (goto-char paren-start)
@@ -189,17 +192,20 @@ Argument PARSE-STATUS is current syntax context."
               (current-column))
           (prog-first-column)))
 
-       ((looking-at "&&\\|||\\|[|&+*/?:-]")
+       ((looking-at-p "&&\\|||\\|[|&+*/?:-]")
         (save-excursion
           (forward-line -1)
-          (unless (re-search-forward "\\(?:return\\|=\\)[ \t]+" (line-end-position) t)
-            (back-to-indentation))
-          (current-column)))
+          (while (looking-at-p "[ \t]*#")
+            (forward-line -1))
+          (if (re-search-forward "\\breturn\\b[ \t]+" (line-end-position) t)
+              (current-column)
+            (back-to-indentation)
+            (current-column))))
 
        ((save-excursion
           (forward-line -1)
-          (back-to-indentation)
-          (looking-at "\\_<\\(if\\|while\\|for\\|else\\|do\\|try\\|catch\\)\\_>"))
+          (end-of-line)
+          (char-equal (char-before) ?\)))
         (save-excursion
           (forward-line -1)
           (back-to-indentation)
@@ -209,8 +215,8 @@ Argument PARSE-STATUS is current syntax context."
         (let ((label-p) (case-p))
           (save-excursion
             (back-to-indentation)
-            (setq label-p (looking-at "\\_<\\([A-Za-z_][A-Za-z0-9_]*\\)\\_>:")
-                  case-p (looking-at "\\_<\\(case\\|default\\)\\_>")))
+            (setq label-p (looking-at-p "\\_<\\([A-Za-z_][A-Za-z0-9_]*\\)\\_>:")
+                  case-p (looking-at-p "\\_<\\(case\\|default\\)\\_>")))
           (goto-char paren-start)
           (back-to-indentation)
           (+ (current-column)
