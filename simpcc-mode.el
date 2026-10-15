@@ -192,7 +192,7 @@ Argument PARSE-STATUS is current syntax context."
               (current-column))
           (prog-first-column)))
 
-       ((looking-at-p "&&\\|||\\|[|&+*/?:-]")
+       ((looking-at-p "&&\\|||\\|[|&?:]")
         (save-excursion
           (forward-line -1)
           (while (looking-at-p "[ \t]*#")
