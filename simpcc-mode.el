@@ -55,6 +55,7 @@
     (modify-syntax-entry ?< "." table)
     (modify-syntax-entry ?> "." table)
     (modify-syntax-entry ?& "." table)
+    (modify-syntax-entry ?| "." table)
     (modify-syntax-entry ?% "." table)
     (modify-syntax-entry ?+ "." table)
     (modify-syntax-entry ?- "." table)
@@ -153,36 +154,28 @@
 (defun simpcc--proper-indentation (parse-status)
   "Simple CC format function.
 Argument PARSE-STATUS is current syntax context."
-  (let ((depth (nth 0 parse-status))             ; Depth in parens
-        (paren-start (nth 1 parse-status))       ; Position of the paren that started this list
-        ;; (paren-prev (nth 2 parse-status))     ; Position of the previous sibling paren
-        ;; (in-string (nth 3 parse-status))      ; Non-nil if inside a string
-        (in-comment (nth 4 parse-status))        ; Non-nil if inside a comment
-        ;; (string-start (nth 5 parse-status))   ; Start position of string or comment
-        ;; (string-end (nth 6 parse-status))     ; End position of string or comment
-        ;; (string-type (nth 7 parse-status))    ; Type of string or comment
-        ;; (string-content (nth 8 parse-status)) ; Content of string or comment
-        ;; (in-block (nth 9 parse-status))       ; Non-nil if inside a code block
-        (cur-line (string-trim-right (thing-at-point 'line t))))
-    ;; Print all information for debugging
-    ;; (message "=== Parse Status ===")
-    ;; (message "Depth: %S" depth)
-    ;; (message "Paren start: %S" paren-start)
-    ;; (message "Paren prev: %S" paren-prev)
-    ;; (message "In string: %S" in-string)
-    ;; (message "In comment: %S" in-comment)
-    ;; (message "String start: %S" string-start)
-    ;; (message "String end: %S" string-end)
-    ;; (message "String type: %S" string-type)
-    ;; (message "String content: %S" string-content)
-    ;; (message "In block: %S" in-block)
+  (let ((depth             (nth 0 parse-status)) ; Depth in parens
+        (paren-start       (nth 1 parse-status)) ; Start position of the outermost list containing point
+        ;; (in-string      (nth 3 parse-status)) ; Non-nil if inside a string (usually the string's terminating char)
+        (in-comment        (nth 4 parse-status)) ; Non-nil if inside a comment
+        ;; (after-quote    (nth 5 parse-status)) ; Non-nil if point is right after a quote character (t or nil)
+        ;; (comment-style  (nth 7 parse-status)) ; Style of the current comment (nil / 1 / 2 / syntax-table)
+        (str-or-cmt-pos (nth 8 parse-status)) ; Start position of the string or comment
+        ;; (open-parens    (nth 9 parse-status)) ; List of open paren positions, outermost first
+        (cur-line      (string-trim-right (thing-at-point 'line t))))
     (save-excursion
       (back-to-indentation)
       (cond
-       (in-comment (current-indentation))
+       ((or in-comment (looking-at-p "/\\*"))
+        (cond
+         ((looking-at-p "[ \t]*#")
+          (prog-first-column))
 
-       ((looking-at-p "[ \t]*#")
-        (prog-first-column))
+         ((or (looking-at-p "[ \t]*$") (looking-at-p "\\*"))
+          (1+ (save-excursion
+                (goto-char str-or-cmt-pos)
+                (current-column))))
+         (t (current-indentation))))
 
        ((looking-at-p "[]})]")
         (if paren-start
@@ -192,20 +185,19 @@ Argument PARSE-STATUS is current syntax context."
               (current-column))
           (prog-first-column)))
 
-       ((looking-at-p "&&\\|||\\|[|&?:]")
+       ((looking-at-p "&&\\|||\\|[|&+-*/?:]\s")
         (save-excursion
           (forward-line -1)
           (while (looking-at-p "[ \t]*#")
             (forward-line -1))
           (if (re-search-forward "\\breturn\\b[ \t]+" (line-end-position) t)
-              (current-column)
-            (back-to-indentation)
+              (back-to-indentation)
             (current-column))))
 
        ((save-excursion
           (forward-line -1)
-          (end-of-line)
-          (char-equal (char-before) ?\)))
+          (and (not (looking-at-p "[ \t]*#"))
+               (looking-at-p ".*\\)[ \t]*$")))
         (save-excursion
           (forward-line -1)
           (back-to-indentation)
