@@ -154,28 +154,27 @@
 (defun simpcc--proper-indentation (parse-status)
   "Simple CC format function.
 Argument PARSE-STATUS is current syntax context."
-  (let ((depth             (nth 0 parse-status)) ; Depth in parens
-        (paren-start       (nth 1 parse-status)) ; Start position of the outermost list containing point
-        ;; (in-string      (nth 3 parse-status)) ; Non-nil if inside a string (usually the string's terminating char)
-        (in-comment        (nth 4 parse-status)) ; Non-nil if inside a comment
-        ;; (after-quote    (nth 5 parse-status)) ; Non-nil if point is right after a quote character (t or nil)
-        ;; (comment-style  (nth 7 parse-status)) ; Style of the current comment (nil / 1 / 2 / syntax-table)
-        (str-or-cmt-pos (nth 8 parse-status)) ; Start position of the string or comment
-        ;; (open-parens    (nth 9 parse-status)) ; List of open paren positions, outermost first
-        (cur-line      (string-trim-right (thing-at-point 'line t))))
+  (let ((depth            (nth 0 parse-status)) ; Depth in parens
+        (paren-start      (nth 1 parse-status)) ; Start position of the outermost list containing point
+        ;; (in-string     (nth 3 parse-status)) ; Non-nil if inside a string (usually the string's terminating char)
+        (in-comment       (nth 4 parse-status)) ; Non-nil if inside a comment
+        ;; (after-quote   (nth 5 parse-status)) ; Non-nil if point is right after a quote character (t or nil)
+        ;; (comment-style (nth 7 parse-status)) ; Style of the current comment (nil / 1 / 2 / syntax-table)
+        (str-or-cmt-pos   (nth 8 parse-status)) ; Start position of the string or comment
+        ;; (open-parens   (nth 9 parse-status)) ; List of open paren positions, outermost first
+        (cur-line         (string-trim-right (thing-at-point 'line t))))
     (save-excursion
       (back-to-indentation)
       (cond
-       ((or in-comment (looking-at-p "/\\*"))
-        (cond
-         ((looking-at-p "[ \t]*#")
-          (prog-first-column))
+       ((looking-at-p "[ \t]*#")
+        (prog-first-column))
 
-         ((or (looking-at-p "[ \t]*$") (looking-at-p "\\*"))
-          (1+ (save-excursion
-                (goto-char str-or-cmt-pos)
-                (current-column))))
-         (t (current-indentation))))
+       ((or in-comment (looking-at-p "/\\*"))
+        (if (or (looking-at-p "[ \t]*$") (looking-at-p "\\*"))
+            (1+ (save-excursion
+                  (goto-char str-or-cmt-pos)
+                  (current-column)))
+          (current-indentation)))
 
        ((looking-at-p "[]})]")
         (if paren-start
@@ -197,7 +196,9 @@ Argument PARSE-STATUS is current syntax context."
        ((save-excursion
           (forward-line -1)
           (and (not (looking-at-p "[ \t]*#"))
-               (looking-at-p ".*\\)[ \t]*$")))
+               (progn
+                 (end-of-line)
+                 (eq (char-before) ?\)))))
         (save-excursion
           (forward-line -1)
           (back-to-indentation)
