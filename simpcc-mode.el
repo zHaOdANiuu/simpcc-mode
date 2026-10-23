@@ -162,7 +162,7 @@ Argument PARSE-STATUS is current syntax context."
         ;; (comment-style (nth 7 parse-status)) ; Style of the current comment (nil / 1 / 2 / syntax-table)
         (str-or-cmt-pos   (nth 8 parse-status)) ; Start position of the string or comment
         ;; (open-parens   (nth 9 parse-status)) ; List of open paren positions, outermost first
-        (cur-line         (string-trim-right (thing-at-point 'line t))))
+        )
     (save-excursion
       (back-to-indentation)
       (cond
@@ -205,17 +205,19 @@ Argument PARSE-STATUS is current syntax context."
           (+ (current-indentation) simpcc-indent-width)))
 
        (paren-start
-        (let ((label-p) (case-p))
+        (let ((label-p) (case-p) (has-case-p))
           (save-excursion
             (back-to-indentation)
             (setq label-p (looking-at-p "\\_<\\([A-Za-z_][A-Za-z0-9_]*\\)\\_>:")
-                  case-p (looking-at-p "\\_<\\(case\\|default\\)\\_>")))
+                  case-p  (looking-at-p "\\_<\\(case\\|default\\)\\_>")
+                  has-case-p (re-search-backward "\\_<\\(case\\|default\\)\\_>" paren-start t)))
           (goto-char paren-start)
           (back-to-indentation)
           (+ (current-column)
              (* simpcc-indent-width
                 (cond
-                 ((looking-at "\\_<switch\\_>") (if case-p 1 2))
+                 ((looking-at-p "\\_<switch\\_>")
+                  (if case-p 1 (if has-case-p 2 1)))
                  (label-p 0)
                  (t 1))))))
 
